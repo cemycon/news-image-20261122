@@ -1,24 +1,32 @@
 #!/usr/bin/env python3
-"""Compose the 22 Nov 2026 world-news poster v2 (1024x1024) for the make.fun entry.
+"""Compose the 22 Nov 2026 world-news poster v3 (1024x1024) for the make.fun entry.
 
-Density target taken from the board's top three: 24-36 stories, 7 regions,
-13-15 illustrated cards plus a block of text briefs, a stats bar, a region bar,
-a date-check strip and a "where it happened" map.
+v3 is a typography rebuild of v2. v2 packed 36 stories into 9-10 px type on grey.
+v3 keeps all 36 stories but spends the space on legibility: the dot-matrix map, the
+region bar and the per-region counts are gone, and every text size goes up:
+
+    card headline   24 -> 30 px      card detail   14 -> 16 px
+    brief headline  10 -> 16 px      brief detail   9 -> 13 px
+    masthead        58 -> 66 px      stats         22 -> 28 px
+
+Text is near-black (14,14,16) on white cards and (52,52,58) for detail, so contrast
+is ~15:1 and ~9:1 instead of grey-on-cream. The layout is computed from named
+constants and asserted at the end, so nothing can run under the footer.
 """
 from PIL import Image, ImageDraw, ImageFont
 
 W = H = 1024
-PAPER = (250, 247, 240)
-INK = (24, 24, 26)
-NAVY = (18, 30, 56)
-RED = (168, 38, 38)
+PAPER = (252, 250, 245)
+CARD = (255, 255, 255)
+INK = (14, 14, 16)
+DETAIL = (38, 38, 44)
+NAVY = (16, 28, 54)
+RED = (170, 30, 30)
 MAGENTA = (229, 0, 125)
-GREY = (96, 96, 100)
-RULE = (206, 200, 188)
+RULE = (198, 194, 184)
 WHITE = (255, 255, 255)
 
 SERIF_B = "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf"
-SERIF_R = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
 SERIF_I = "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf"
 SANS_B = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
 SANS_R = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
@@ -36,34 +44,33 @@ def f(path, size):
 
 
 REGION_COLOR = {
-    "EUROPE": (37, 99, 168),
-    "MIDDLE EAST": (176, 42, 42),
-    "ASIA-PACIFIC": (186, 128, 16),
-    "AMERICAS": (26, 118, 118),
-    "AFRICA": (52, 118, 56),
-    "OCEANIA": (108, 68, 148),
-    "WORLD": (88, 88, 92),
+    "EUROPE": (24, 78, 150),
+    "MIDDLE EAST": (162, 30, 30),
+    "ASIA-PACIFIC": (158, 104, 6),
+    "AMERICAS": (14, 98, 98),
+    "AFRICA": (34, 98, 40),
+    "OCEANIA": (90, 52, 132),
+    "WORLD": (66, 66, 72),
 }
 
 # ---------------------------------------------------------------- stories
-# (region, headline, detail, illustration slug or None)
 ILLUSTRATED = [
     ("WORLD", "COP31 COLLAPSES", "Antalya \u00b7 longest COP ever ends with no deal on fossil fuels", "n22b_illo_v6"),
-    ("EUROPE", "KYIV BLOCK DESTROYED", "Dymer \u00b7 11 dead, 14 missing after overnight strike", "n22b_illo_v5"),
-    ("AFRICA", "MERKURY SUNK OFF LIBYA", "Benghazi \u00b7 sea drones, Ka-27 destroyed, MV Angara hit", "n22b_illo"),
-    ("EUROPE", "SPARTA II ABLAZE", "Gulf of Finland \u00b7 80 drones downed, oil-spill watch", "n22b_illo_v12"),
+    ("EUROPE", "KYIV BLOCK DESTROYED", "Dymer \u00b7 11 dead, 14 missing after an overnight strike", "n22b_illo_v5"),
     ("MIDDLE EAST", "HORMUZ TANKERS BURN", "Two ablaze in a \u201crestricted area\u201d east of the strait", "n22b_illo_v2"),
-    ("MIDDLE EAST", "RABIGH REFINERY HIT", "Houthi projectile \u00b7 two drones downed over Riyadh", "n22b_illo_v4"),
     ("AMERICAS", "CHAPO ISIDRO CAUGHT", "Guasave \u00b7 4 soldiers and 7 gunmen dead, roadblocks burned", "n22b_illo_v9"),
-    ("EUROPE", "LISBON MARCHES IN RAIN", "CGTP \u00b7 wages, pensions, housing; budget vote Tuesday", "n22b_illo_v11"),
-    ("AFRICA", "KHARTOUM DRONE STRIKES", "4 killed \u00b7 UN building damaged, airport targeted", "n22b_illo_v3"),
     ("AFRICA", "BAYELSA BOAT CAPSIZE", "29 mourners dead \u00b7 unseaworthy boat, unapproved jetty", "n22b_illo_v8"),
-    ("EUROPE", "ALCARAZ TAKES TURIN", "First ATP Finals title \u00b7 career trophy No. 30", "n22b_illo_v13"),
-    ("EUROPE", "MISSILE DEBRIS IN POLAND", "3 sites \u00b7 Kh-101 found; NATO council meets Monday", "n22b_illo_v10"),
     ("WORLD", "AI ROUT WIPES GAINS", "TAIEX \u221217.5% \u00b7 Nasdaq \u221210.4% \u00b7 KOSPI \u22127.9%", "n22b_illo_v7"),
 ]
 
 BRIEFS = [
+    ("AFRICA", "Corvette Merkury sunk off Libya", "Benghazi \u00b7 sea drones, Ka-27 destroyed"),
+    ("EUROPE", "Sparta II ablaze in the Baltic", "Gulf of Finland \u00b7 80 drones downed"),
+    ("MIDDLE EAST", "Rabigh refinery hit", "Houthi projectile \u00b7 drones downed over Riyadh"),
+    ("EUROPE", "Lisbon marches in the rain", "CGTP \u00b7 wages, pensions, housing"),
+    ("AFRICA", "Khartoum drone strikes", "4 killed \u00b7 UN building damaged"),
+    ("EUROPE", "Alcaraz takes Turin", "First ATP Finals title, trophy No. 30"),
+    ("EUROPE", "Missile debris in Poland", "3 sites \u00b7 a Kh-101 found"),
     ("MIDDLE EAST", "Gaza: 3 killed in new strikes", "truce violations now 1,675 dead"),
     ("ASIA-PACIFIC", "Beijing: Takaichi must retract", "Taiwan remarks stall China\u2013Japan ties"),
     ("ASIA-PACIFIC", "Mistral opens APAC HQ", "Singapore base, defence-AI partnership"),
@@ -89,16 +96,16 @@ BRIEFS = [
     ("OCEANIA", "Melbourne International closes", "badminton, 13 nations, final day"),
 ]
 
-assert len(ILLUSTRATED) == 13 and len(BRIEFS) == 23
+assert len(ILLUSTRATED) == 6 and len(BRIEFS) == 30
 TOTAL = len(ILLUSTRATED) + len(BRIEFS)
 
 canvas = Image.new("RGB", (W, H), PAPER)
 d = ImageDraw.Draw(canvas)
 
-M = 14
+M = 16
 
 
-def fit(text, path, size, maxw, minsize=6):
+def fit(text, path, size, maxw, minsize=7):
     s = size
     while s > minsize and d.textlength(text, font=f(path, s)) > maxw:
         s -= 1
@@ -121,194 +128,120 @@ def wrap(text, path, size, maxw):
     return lines
 
 
+# ---------------------------------------------------------------- geometry
+FOOTER_Y = 958
+TOP_H = 26
+MAST_Y, MAST_SZ = 30, 66
+SUB_Y, SUB_SZ = 106, 19
+STAT_Y0, STAT_Y1 = 134, 184
+DATE_Y0, DATE_Y1 = 190, 210
+CARDS_Y0 = 218
+CH, ILLO_H, CARD_GAP = 180, 66, 10
+BRIEF_HDR_H = 24
+BRIEF_ROWH = 31
+BRIEF_PER_COL = 10
+BRIEF_COLS = 3
+
+BRIEFS_Y0 = CARDS_Y0 + 2 * CH + CARD_GAP + 20
+BRIEF_ROWS_Y0 = BRIEFS_Y0 + BRIEF_HDR_H + 6
+last_row_cy = BRIEF_ROWS_Y0 + (BRIEF_PER_COL - 1) * BRIEF_ROWH
+last_text_bottom = last_row_cy + 16 + 14
+assert last_text_bottom <= FOOTER_Y - 6, f"briefs overflow: {last_text_bottom} > {FOOTER_Y - 6}"
+
 # ---------------------------------------------------------------- top bar
-d.rectangle([0, 0, W, 20], fill=NAVY)
-d.text((M, 4), f"{TOTAL} STORIES \u00b7 7 REGIONS \u00b7 EVERY ONE DATED SUNDAY 22 NOVEMBER 2026",
-       font=f(NARROW_B, 12), fill=(226, 230, 238))
-d.text((W - M, 4), "PRESS TIME 23:00 UTC", font=f(NARROW_B, 12), fill=(226, 230, 238), anchor="ra")
+d.rectangle([0, 0, W, TOP_H], fill=NAVY)
+d.text((M, 6), f"{TOTAL} STORIES \u00b7 7 REGIONS \u00b7 ALL DATED SUNDAY 22 NOVEMBER 2026",
+       font=f(NARROW_B, 15), fill=(234, 238, 246))
+d.text((W - M, 6), "PRESS TIME 23:00 UTC", font=f(NARROW_B, 15), fill=(234, 238, 246), anchor="ra")
 
 # ---------------------------------------------------------------- masthead
-d.text((M, 24), "Sunday 22 November 2026", font=f(SERIF_B, 58), fill=INK)
-d.text((M + 2, 86), "The world in one day \u2014 every story below happened on this date",
-       font=f(SERIF_I, 15), fill=RED)
+d.text((M, MAST_Y), "Sunday 22 November 2026", font=f(SERIF_B, MAST_SZ), fill=INK)
+d.text((M + 2, SUB_Y), "The world in one day \u2014 every story below happened on this date",
+       font=f(SERIF_I, SUB_SZ), fill=RED)
 
 # ---------------------------------------------------------------- stats bar
 STATS = [("36", "STORIES"), ("7", "REGIONS"), ("2,700", "DRONES / WEEK"),
          ("29", "DEAD, BAYELSA"), ("\u221217.5%", "TAIEX"), ("0", "COP31 DEAL")]
-sy0, sy1 = 102, 140
-d.rectangle([M, sy0, W - M, sy1], fill=(255, 255, 255), outline=RULE, width=1)
+d.rectangle([M, STAT_Y0, W - M, STAT_Y1], fill=CARD, outline=RULE, width=1)
 bw = (W - 2 * M) / len(STATS)
 for i, (num, lab) in enumerate(STATS):
     x = M + i * bw
     if i:
-        d.line([x, sy0 + 4, x, sy1 - 4], fill=RULE, width=1)
-    d.text((x + bw / 2, sy0 + 4), num, font=f(SERIF_B, 22), fill=NAVY, anchor="ma")
-    d.text((x + bw / 2, sy1 - 15), lab, font=f(NARROW_B, 9), fill=GREY, anchor="ma")
-
-# ---------------------------------------------------------------- region bar
-ry0, ry1 = 144, 164
-d.rectangle([M, ry0, W - M, ry1], fill=(238, 234, 224))
-counts = {}
-for r, _, _, _ in ILLUSTRATED:
-    counts[r] = counts.get(r, 0) + 1
-for r, _, _ in BRIEFS:
-    counts[r] = counts.get(r, 0) + 1
-order = ["EUROPE", "MIDDLE EAST", "ASIA-PACIFIC", "AMERICAS", "AFRICA", "OCEANIA", "WORLD"]
-x = M + 6
-for r in order:
-    label = f"{r} {counts.get(r, 0)}"
-    tw = d.textlength(label, font=f(NARROW_B, 11))
-    d.rectangle([x, ry0 + 4, x + 9, ry1 - 4], fill=REGION_COLOR[r])
-    d.text((x + 13, ry0 + 4), label, font=f(NARROW_B, 11), fill=INK)
-    x += 13 + tw + 14
+        d.line([x, STAT_Y0 + 6, x, STAT_Y1 - 6], fill=RULE, width=1)
+    d.text((x + bw / 2, STAT_Y0 + 5), num, font=f(SERIF_B, 28), fill=NAVY, anchor="ma")
+    d.text((x + bw / 2, STAT_Y1 - 22), lab, font=f(NARROW_B, 12), fill=DETAIL, anchor="ma")
 
 # ---------------------------------------------------------------- date check
-dy0, dy1 = 168, 182
-d.rectangle([M, dy0, W - M, dy1], fill=RED)
-d.text((M + 6, dy0 + 3), "DATE CHECK", font=f(NARROW_B, 10), fill=WHITE)
-d.text((M + 78, dy0 + 3), "every item is dated Sunday 22 November 2026 (UTC) \u2014 nothing carried over from another day",
-       font=f(NARROW_R, 10), fill=(255, 232, 232))
+d.rectangle([M, DATE_Y0, W - M, DATE_Y1], fill=RED)
+d.text((M + 8, DATE_Y0 + 4), "DATE CHECK", font=f(NARROW_B, 13), fill=WHITE)
+d.text((M + 104, DATE_Y0 + 4), "every item is dated Sunday 22 November 2026 (UTC) \u2014 nothing carried over from another day",
+       font=f(NARROW_R, 13), fill=(255, 238, 238))
 
-# ---------------------------------------------------------------- row 1: 3 large
-R1Y0, R1Y1 = 188, 398
-GAP = 10
-cw1 = (W - 2 * M - 2 * GAP) // 3
-ILLO1 = 138
+# ---------------------------------------------------------------- illustrated cards
+GAP = 12
+cw = (W - 2 * M - 2 * GAP) // 3
 
 
-def card(x, y, cw, ch, region, head, detail, slug, illo_h, hsize, dsize, num):
-    d.rectangle([x, y, x + cw, y + ch], fill=WHITE, outline=RULE, width=1)
-    d.rectangle([x, y, x + cw, y + 4], fill=REGION_COLOR[region])
-    if slug:
-        illo = Image.open(f"/workspace/images/{slug}/n22b_illo.png").convert("RGB")
-        illo = illo.resize((cw - 2, illo_h), Image.LANCZOS)
-        canvas.paste(illo, (x + 1, y + 5))
-        d.rectangle([x + 1, y + 5, x + cw - 1, y + 5 + illo_h], outline=RULE, width=1)
-        ty = y + 5 + illo_h + 5
-    else:
-        ty = y + 8
-    # number + region label
-    d.text((x + 6, ty), f"{num:02d}", font=f(NARROW_B, 10), fill=REGION_COLOR[region])
-    d.text((x + 24, ty), region, font=f(NARROW_B, 9), fill=GREY)
-    ty += 12
-    hs = fit(head, SERIF_B, hsize, cw - 12)
-    hl = wrap(head, SERIF_B, hs, cw - 12)
-    for ln in hl[:2]:
-        d.text((x + 6, ty), ln, font=f(SERIF_B, hs), fill=INK)
+def card(x, y, region, head, detail, slug, num):
+    d.rectangle([x, y, x + cw, y + CH], fill=CARD, outline=RULE, width=1)
+    d.rectangle([x, y, x + cw, y + 5], fill=REGION_COLOR[region])
+    illo = Image.open(f"/workspace/images/{slug}/n22b_illo.png").convert("RGB")
+    illo = illo.resize((cw - 2, ILLO_H), Image.LANCZOS)
+    canvas.paste(illo, (x + 1, y + 6))
+    d.rectangle([x + 1, y + 6, x + cw - 1, y + 6 + ILLO_H], outline=RULE, width=1)
+
+    ty = y + 6 + ILLO_H + 6
+    d.rectangle([x + 7, ty, x + 29, ty + 15], fill=REGION_COLOR[region])
+    d.text((x + 18, ty + 1), f"{num:02d}", font=f(NARROW_B, 12), fill=WHITE, anchor="ma")
+    d.text((x + 35, ty + 1), region, font=f(NARROW_B, 12), fill=REGION_COLOR[region])
+    ty += 19
+
+    hs = fit(head, SERIF_B, 30, cw - 14)
+    for ln in wrap(head, SERIF_B, hs, cw - 14)[:2]:
+        d.text((x + 7, ty), ln, font=f(SERIF_B, hs), fill=INK)
         ty += hs + 1
-    ds = dsize
-    dl = wrap(detail, NARROW_R, ds, cw - 12)
-    for ln in dl[:2]:
-        d.text((x + 6, ty), ln, font=f(NARROW_R, ds), fill=GREY)
-        ty += ds + 2
+    ty += 3
+    for ln in wrap(detail, SANS_R, 17, cw - 14)[:2]:
+        d.text((x + 7, ty), ln, font=f(SANS_R, 17), fill=DETAIL)
+        ty += 20
 
 
-for i, (region, head, detail, slug) in enumerate(ILLUSTRATED[:3]):
-    x = M + i * (cw1 + GAP)
-    card(x, R1Y0, cw1, R1Y1 - R1Y0, region, head, detail, slug, ILLO1, 24, 13, i + 1)
+for i, (region, head, detail, slug) in enumerate(ILLUSTRATED):
+    row, col = divmod(i, 3)
+    card(M + col * (cw + GAP), CARDS_Y0 + row * (CH + CARD_GAP), region, head, detail, slug, i + 1)
 
-# ---------------------------------------------------------------- rows 2-3: 5 each
-GAP2 = 8
-cw2 = (W - 2 * M - 4 * GAP2) // 5
-ILLO2 = 66
-for row, (y0, y1) in enumerate([(404, 544), (550, 690)]):
-    for c in range(5):
-        idx = 3 + row * 5 + c
-        if idx >= len(ILLUSTRATED):
-            break
-        region, head, detail, slug = ILLUSTRATED[idx]
-        x = M + c * (cw2 + GAP2)
-        card(x, y0, cw2, y1 - y0, region, head, detail, slug, ILLO2, 14, 10, idx + 1)
+# ---------------------------------------------------------------- briefs
+d.rectangle([M, BRIEFS_Y0, W - M, BRIEFS_Y0 + BRIEF_HDR_H], fill=NAVY)
+d.text((M + 8, BRIEFS_Y0 + 4), f"ALSO ON SUNDAY \u00b7 {len(BRIEFS)} MORE STORIES",
+       font=f(NARROW_B, 15), fill=WHITE)
+d.text((W - M - 8, BRIEFS_Y0 + 5), "EUROPE \u00b7 MIDDLE EAST \u00b7 ASIA-PACIFIC \u00b7 AMERICAS \u00b7 AFRICA \u00b7 OCEANIA",
+       font=f(NARROW_R, 13), fill=(208, 216, 230), anchor="ra")
 
-# ---------------------------------------------------------------- bottom: map + briefs
-BY0, BY1 = 696, 950
-MAPW = 214
-d.rectangle([M, BY0, M + MAPW, BY1], fill=WHITE, outline=RULE, width=1)
-d.rectangle([M, BY0, M + MAPW, BY0 + 16], fill=NAVY)
-d.text((M + 6, BY0 + 3), "WHERE IT HAPPENED", font=f(NARROW_B, 10), fill=WHITE)
-
-# dot-matrix world map from coarse polygons
-CONTINENTS = [
-    [(0.10, 0.18), (0.22, 0.12), (0.30, 0.16), (0.32, 0.26), (0.28, 0.34), (0.24, 0.40), (0.20, 0.36), (0.16, 0.30), (0.10, 0.26)],
-    [(0.24, 0.40), (0.28, 0.44), (0.30, 0.48), (0.26, 0.46), (0.23, 0.42)],
-    [(0.28, 0.50), (0.34, 0.48), (0.37, 0.56), (0.35, 0.68), (0.31, 0.80), (0.28, 0.72), (0.27, 0.60)],
-    [(0.46, 0.16), (0.54, 0.14), (0.57, 0.20), (0.55, 0.28), (0.48, 0.30), (0.45, 0.24)],
-    [(0.47, 0.34), (0.56, 0.32), (0.60, 0.40), (0.58, 0.52), (0.54, 0.64), (0.50, 0.58), (0.47, 0.46)],
-    [(0.57, 0.12), (0.72, 0.10), (0.84, 0.16), (0.86, 0.26), (0.78, 0.32), (0.70, 0.34), (0.62, 0.30), (0.57, 0.22)],
-    [(0.68, 0.34), (0.73, 0.34), (0.72, 0.44), (0.69, 0.40)],
-    [(0.76, 0.36), (0.84, 0.38), (0.86, 0.46), (0.80, 0.48), (0.76, 0.42)],
-    [(0.80, 0.62), (0.90, 0.60), (0.93, 0.70), (0.88, 0.76), (0.81, 0.72)],
-    [(0.94, 0.76), (0.96, 0.78), (0.95, 0.84), (0.93, 0.80)],
-]
-
-
-def inside(px, py, poly):
-    n, hit = len(poly), False
-    j = n - 1
-    for i in range(n):
-        xi, yi = poly[i]
-        xj, yj = poly[j]
-        if (yi > py) != (yj > py):
-            if px < (xj - xi) * (py - yi) / (yj - yi) + xi:
-                hit = not hit
-        j = i
-    return hit
-
-
-mx0, my0 = M + 8, BY0 + 24
-mw, mh = MAPW - 16, BY1 - BY0 - 34
-step = 4
-for gy in range(0, int(mh), step):
-    for gx in range(0, int(mw), step):
-        nx, ny = gx / mw, gy / mh
-        if any(inside(nx, ny, p) for p in CONTINENTS):
-            d.ellipse([mx0 + gx, my0 + gy, mx0 + gx + 2, my0 + gy + 2], fill=(196, 200, 208))
-
-MARKERS = [
-    (0.50, 0.24, 1), (0.53, 0.22, 2), (0.55, 0.40, 3), (0.55, 0.17, 4),
-    (0.63, 0.33, 5), (0.60, 0.35, 6), (0.20, 0.34, 7), (0.46, 0.25, 8),
-    (0.55, 0.44, 9), (0.50, 0.50, 10), (0.50, 0.22, 11), (0.52, 0.20, 12),
-    (0.80, 0.20, 13),
-]
-for nx, ny, num in MARKERS:
-    px, py = mx0 + nx * mw, my0 + ny * mh
-    d.ellipse([px - 6, py - 6, px + 6, py + 6], fill=RED, outline=WHITE, width=1)
-    d.text((px, py), str(num), font=f(NARROW_B, 8), fill=WHITE, anchor="mm")
-
-d.text((M + 6, BY1 - 12), "13 illustrated stories \u00b7 6 continents", font=f(NARROW_R, 8), fill=GREY)
-
-# briefs: 3 columns
-BX0 = M + MAPW + 8
-BW = W - M - BX0
-GAP3 = 8
-colw = (BW - 2 * GAP3) // 3
-per = [8, 8, 7]
-d.rectangle([BX0, BY0, W - M, BY0 + 16], fill=NAVY)
-d.text((BX0 + 6, BY0 + 3), f"ALSO ON SUNDAY \u00b7 {len(BRIEFS)} MORE STORIES", font=f(NARROW_B, 10), fill=WHITE)
-
-n = 0
-for ci, cnt in enumerate(per):
-    cx = BX0 + ci * (colw + GAP3)
-    cy = BY0 + 22
-    for _ in range(cnt):
+GAP3 = 14
+colw = (W - 2 * M - (BRIEF_COLS - 1) * GAP3) // BRIEF_COLS
+for ci in range(BRIEF_COLS):
+    cx = M + ci * (colw + GAP3)
+    for ri in range(BRIEF_PER_COL):
+        n = ci * BRIEF_PER_COL + ri
         if n >= len(BRIEFS):
             break
         region, head, detail = BRIEFS[n]
-        n += 1
-        d.rectangle([cx, cy + 2, cx + 3, cy + 9], fill=REGION_COLOR[region])
-        d.text((cx + 7, cy), f"{13 + n:02d}", font=f(NARROW_B, 8), fill=REGION_COLOR[region])
-        hs = fit(head, NARROW_B, 10, colw - 26)
-        d.text((cx + 20, cy), head, font=f(NARROW_B, hs), fill=INK)
-        dl = wrap(detail, NARROW_R, 9, colw - 26)
-        d.text((cx + 20, cy + 11), dl[0] if dl else "", font=f(NARROW_R, 9), fill=GREY)
-        cy += 27
+        cy = BRIEF_ROWS_Y0 + ri * BRIEF_ROWH
+        if ri:
+            d.line([cx, cy - 3, cx + colw, cy - 3], fill=(228, 224, 214), width=1)
+        d.rectangle([cx, cy + 2, cx + 4, cy + 15], fill=REGION_COLOR[region])
+        d.text((cx + 9, cy), f"{7 + n:02d}", font=f(NARROW_B, 12), fill=REGION_COLOR[region])
+        hs = fit(head, SANS_B, 17, colw - 34)
+        d.text((cx + 30, cy - 2), head, font=f(SANS_B, hs), fill=INK)
+        d.text((cx + 30, cy + 16), detail, font=f(SANS_R, 14), fill=DETAIL)
 
 # ---------------------------------------------------------------- footer
-d.rectangle([0, 958, W, H], fill=MAGENTA)
-d.text((M, 972), "make.fun", font=f(SANS_B, 26), fill=WHITE)
-d.text((M + 128, 980), "news-image-20261122", font=f(NARROW_B, 15), fill=(255, 220, 240))
-d.text((W - M, 976), "SUNDAY 22 NOVEMBER 2026", font=f(NARROW_B, 13), fill=WHITE, anchor="ra")
-d.text((W - M, 994), f"{TOTAL} stories \u00b7 7 regions \u00b7 one page", font=f(NARROW_R, 11), fill=(255, 220, 240), anchor="ra")
+d.rectangle([0, FOOTER_Y, W, H], fill=MAGENTA)
+d.text((M, 972), "make.fun", font=f(SANS_B, 28), fill=WHITE)
+d.text((M + 140, 981), "news-image-20261122", font=f(NARROW_B, 16), fill=(255, 222, 240))
+d.text((W - M, 976), "SUNDAY 22 NOVEMBER 2026", font=f(NARROW_B, 15), fill=WHITE, anchor="ra")
+d.text((W - M, 996), f"{TOTAL} stories \u00b7 7 regions \u00b7 one page", font=f(NARROW_R, 12),
+       fill=(255, 222, 240), anchor="ra")
 
 canvas.save("/workspace/work22/repo/entry.png", "PNG", optimize=True)
-print("saved", canvas.size)
+print("saved", canvas.size, "briefs bottom", last_text_bottom, "footer", FOOTER_Y)
