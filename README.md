@@ -15,25 +15,29 @@ An entry for make.fun's bounty **"Sum up 22 November's world news in one image"*
 one-line detail, plus **21 text briefs** in three columns, a statistics bar, a region bar,
 a date-check strip and a "where it happened" map, under a masthead naming the day.
 
-This is **v4**. It keeps v2's density and layout and promotes the two strongest briefs of
-v2 to illustrated cards, so the illustrated count rises from 13 to 15 and the brief count
-falls from 23 to 21 — the story count stays at 36 and the region count at 7.
+This is **v5**. It is v4 with every type size raised for legibility — nothing else changes.
+The story count stays at 36, the illustrated count at 15, the brief count at 21 and the
+region count at 7; the story order, headlines, details and visual style are identical.
+Room for the larger type comes from shorter illustration strips and a narrower map panel,
+not from dropping content.
 
-| | v2 | v4 |
+| | v4 | v5 |
 |---|---|---|
 | Stories | 36 | 36 |
-| Illustrated cards | 13 | **15** |
-| Text briefs | 23 | **21** |
+| Illustrated cards | 15 | 15 |
+| Text briefs | 21 | 21 |
 | Regions | 7 | 7 |
-| Map markers | 13 | **15** |
-| Stats bar | 6 cells | 6 cells (one now reads "15 ILLUSTRATED") |
-
-The two promoted stories:
-
-| # | Story | Where |
-|---|-------|-------|
-| 14 | Beijing tells Tokyo to retract the Taiwan remarks; China–Japan ties stall | Beijing / Tokyo |
-| 15 | Zelensky: 2,700 drones, 1,460 glide bombs and 165 missiles in one week | Ukraine |
+| Masthead | 58 px | **62 px** |
+| Row-1 headline | 24 px | **28 px** |
+| Row-1 detail | 13 px | **15 px** |
+| Row-2/3 headline | 13 px | **15 px** |
+| Row-2/3 detail | 9 px | **11 px** |
+| Brief headline | 10 px | **12 px** |
+| Brief detail | 9 px | **10 px** |
+| Stats number | 22 px | **26 px** |
+| Detail colour | grey (96,96,100) | **near-black (38,38,44)** |
+| Headline colour | (24,24,26) | **(14,14,16)** |
+| File size | 622,094 B | **515,356 B** |
 
 The fifteen illustrated stories:
 
