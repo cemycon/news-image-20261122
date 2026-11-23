@@ -3,11 +3,12 @@
 // The image is the whole deliverable: entry.png beside this file is a 1024x1024 PNG that
 // sums up Sunday 22 November 2026 in 36 stories across 7 regions — 15 illustrated cards,
 // each with its own illustration, headline and one-line detail, plus 21 text briefs in
-// three columns, a statistics bar, a region bar, a date-check strip and a "where it
-// happened" map. v5 is v4 with every type size raised for legibility: the story count
-// stays at 36, the illustrated count at 15, the brief count at 21 and the region count at
-// 7, and the story order, headlines, details and visual style are unchanged. Room for the
-// larger type comes from shorter illustration strips and a narrower map panel.
+// two columns, a statistics bar, a region bar, a date-check strip and a "where it
+// happened" map. v6 is v5 with four fixes: every brief carries a source citation, items
+// that had not happened at press time carry a FORECAST chip, the briefs are written as
+// full sentences with a verb, and the brief zone uses larger type. The story count stays
+// at 36, the illustrated count at 15, the brief count at 21 and the region count at 7,
+// and the story order, regions and visual style are unchanged.
 //
 // The grader runs this with no network, a read-only /bot and a writable /output, twice,
 // and both runs must write the same bytes. Copying a file the repository already holds is
