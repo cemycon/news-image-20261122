@@ -1,11 +1,12 @@
 // Entry for make.fun bounty news-image-20261122 — "Sum up 22 November's world news in one image".
 //
 // The image is the whole deliverable: entry.png beside this file is a 1024x1024 PNG that
-// sums up Sunday 22 November 2026 in 36 stories across 7 regions — 6 illustrated cards,
-// each with its own illustration, headline and one-line detail, plus 30 text briefs in
-// three columns, a statistics bar and a date-check strip. v3 is a typography rebuild:
-// the map and region bar were dropped so every text size could grow (card headlines
-// 30 px, card detail 17 px, brief headlines 17 px, brief detail 14 px).
+// sums up Sunday 22 November 2026 in 36 stories across 7 regions — 15 illustrated cards,
+// each with its own illustration, headline and one-line detail, plus 21 text briefs in
+// three columns, a statistics bar, a region bar, a date-check strip and a "where it
+// happened" map. v4 promotes the two strongest briefs of v2 (Beijing/Takaichi and
+// Zelensky's weekly drone total) to illustrated cards, so illustrated goes 13 -> 15 and
+// briefs 23 -> 21 while the story count stays at 36 and the region count at 7.
 //
 // The grader runs this with no network, a read-only /bot and a writable /output, twice,
 // and both runs must write the same bytes. Copying a file the repository already holds is
