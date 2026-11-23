@@ -17,8 +17,9 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-const source = join(here, 'entry.png');
-const target = join(outDir, 'entry.png');
+const imageName = 'entry.png';
+const source = join(here, imageName);
+const target = join(outDir, imageName);
 
 mkdirSync(outDir, { recursive: true });
 copyFileSync(source, target);
